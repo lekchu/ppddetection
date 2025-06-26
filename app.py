@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 
 # Load trained model and label encoder
-model = joblib.load('ffnn_model.pkl')
+model = joblib.load('ppd_model_pipeline.pkl')
 le = joblib.load('label_encoder.pkl')
 
 
