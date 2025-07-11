@@ -1,3 +1,4 @@
+
 import streamlit as st
 import base64
 import joblib
@@ -65,15 +66,14 @@ if st.session_state.page == "intro":
         submitted = st.form_submit_button("Start Questionnaire")
 
         if submitted:
-    st.session_state.user_data = {
-        "Name": name,
-        "Age": age,
-        "Pregnant": pregnant,
-        "RecentBirth": recent_birth,
-        "FamilySupport": family_support
-    }
-    st.session_state.page = "questionnaire"
-    st.experimental_rerun()
+            st.session_state.user_data = {
+                "Name": name,
+                "Age": age,
+                "Pregnant": pregnant,
+                "RecentBirth": recent_birth,
+                "FamilySupport": family_support
+            }
+            st.session_state.page = "questionnaire"
+            st.experimental_rerun()
 
-            
-            go_to("questionnaire")
+        
