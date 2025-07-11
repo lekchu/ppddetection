@@ -1,49 +1,75 @@
 import streamlit as st
+import base64
+import joblib
+import pandas as pd
+
+# Load model
+model = joblib.load("model/ppd_model_pipeline.pkl")
+le = joblib.load("model/label_encoder.pkl")
 
 # Set page config
-st.set_page_config(page_title="PPD App", layout="wide")
+st.set_page_config(page_title="Postpartum Depression Predictor", layout="wide")
 
-# Initialize session state
+# Background styling
+@st.cache_data(show_spinner=False)
+def get_base64_bg(image_file):
+    with open(image_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_background(image_file):
+    bg = get_base64_bg(image_file)
+    st.markdown(f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/png;base64,{bg}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
+
+set_background("assets/background.png")
+
+# Session state init
 if "page" not in st.session_state:
-    st.session_state.page = "home"
+    st.session_state.page = "intro"
+if "user_data" not in st.session_state:
+    st.session_state.user_data = {}
+if "answers" not in st.session_state:
+    st.session_state.answers = []
+if "q_index" not in st.session_state:
+    st.session_state.q_index = 0
 
-# Navigation logic
-def go_to(page_name):
-    st.session_state.page = page_name
+# Routing function
+def go_to(page):
+    st.session_state.page = page
 
-# HOME PAGE
-def show_home():
+# INTRO PAGE
+if st.session_state.page == "intro":
+    st.image("assets/mom_baby.png", width=200)
     st.title("🧠 Postpartum Depression Predictor")
-    st.markdown("Welcome to the Postpartum Depression Predictor!")
-    st.image("assets/mom_baby.png", width=250)
-    st.markdown("👉 Click below to begin the questionnaire")
-    if st.button("Start Questionnaire"):
-        go_to("questionnaire")
+    st.markdown("""
+        Welcome to the Postpartum Depression Predictor 🌸
 
-# QUESTIONNAIRE PAGE
-def show_questionnaire():
-    st.header("📝 Questionnaire")
-    st.markdown("Please answer the following questions:")
+        This tool helps assess postpartum depression risk based on your responses to simple personal and emotional questions.
+    """)
 
-    # Sample question (you can expand this)
-    answer = st.radio("Q1: Have you felt down or depressed recently?", 
-                      ["Not at all", "Several days", "Nearly every day"])
+    with st.form("intro_form"):
+        name = st.text_input("Your Name")
+        age = st.slider("Age", 18, 45, 28)
+        pregnant = st.radio("Are you currently pregnant?", ["Yes", "No"])
+        recent_birth = st.radio("Have you given birth recently?", ["Yes", "No"])
+        family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
+        submitted = st.form_submit_button("Start Questionnaire")
 
-    if st.button("Submit & View Result"):
-        go_to("result")
-
-# RESULT PAGE
-def show_result():
-    st.header("🎯 Prediction Result")
-    st.markdown("Based on your answers, here is your result:")
-    st.success("🔵 Risk Level: Mild")  # (Replace with actual prediction)
-    if st.button("Back to Home"):
-        go_to("home")
-
-# Route to correct page
-if st.session_state.page == "home":
-    show_home()
-elif st.session_state.page == "questionnaire":
-    show_questionnaire()
-elif st.session_state.page == "result":
-    show_result()
+        if submitted:
+            st.session_state.user_data = {
+                "Name": name,
+                "Age": age,
+                "Pregnant": pregnant,
+                "RecentBirth": recent_birth,
+                "FamilySupport": family_support
+            }
+            go_to("questionnaire")
