@@ -64,14 +64,25 @@ if st.session_state.page == "intro":
         recent_birth = st.radio("Have you given birth recently?", ["Yes", "No"])
         family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
         submitted = st.form_submit_button("Start Questionnaire")
+        form_submitted = False
+with st.form("intro_form"):
+    name = st.text_input("Your Name")
+    age = st.slider("Age", 18, 45, 28)
+    pregnant = st.radio("Are you currently pregnant?", ["Yes", "No"])
+    recent_birth = st.radio("Have you given birth recently?", ["Yes", "No"])
+    family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
+    submitted = st.form_submit_button("Start Questionnaire")
 
-    if submitted:
-            st.session_state.user_data = {
-                "Name": name,
-                "Age": age,
-                "Pregnant": pregnant,
-                "RecentBirth": recent_birth,
-                "FamilySupport": family_support
-            }
-            st.session_state.page = "questionnaire"
-            st.experimental_rerun()
+if submitted:
+    st.session_state.user_data = {
+        "Name": name,
+        "Age": age,
+        "Pregnant": pregnant,
+        "RecentBirth": recent_birth,
+        "FamilySupport": family_support
+    }
+    st.session_state.page = "questionnaire"
+    st.experimental_rerun()
+
+
+   
