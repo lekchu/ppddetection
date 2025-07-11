@@ -75,5 +75,5 @@ if st.session_state.page == "intro":
     st.session_state.page = "questionnaire"
     st.experimental_rerun()
 
-            }
+            
             go_to("questionnaire")
