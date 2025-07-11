@@ -63,17 +63,18 @@ if st.session_state.page == "intro":
     pregnant = st.radio("Are you currently pregnant?", ["Yes", "No"])
     recent_birth = st.radio("Have you given birth recently?", ["Yes", "No"])
     family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
-
+    
     if st.button("Start Questionnaire"):
-        st.session_state.user_data = {
-            "Name": name,
-            "Age": age,
-            "Pregnant": pregnant,
-            "RecentBirth": recent_birth,
-            "FamilySupport": family_support
-        }
-        st.session_state.page = "questionnaire"
-        st.experimental_rerun()
+    st.session_state.user_data = {
+        "Name": name,
+        "Age": age,
+        "Pregnant": pregnant,
+        "RecentBirth": recent_birth,
+        "FamilySupport": family_support
+    }
+    st.session_state.page = "questionnaire"
+    st.success("Starting questionnaire... please wait a moment ⏳")
+    st.stop()
 
 
-   
+    
