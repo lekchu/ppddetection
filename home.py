@@ -65,15 +65,14 @@ if st.session_state.page == "intro":
         family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
         submitted = st.form_submit_button("Start Questionnaire")
 
-        if submitted:
-            st.session_state.user_data = {
-                "Name": name,
-                "Age": age,
-                "Pregnant": pregnant,
-                "RecentBirth": recent_birth,
-                "FamilySupport": family_support
-            }
-            st.session_state.page = "questionnaire"
-            st.experimental_rerun()
+       
+            if st.button("Next"):
+    if ans is not None:
+        st.session_state.answers.append(score_map[options.index(ans)])
+        st.session_state.q_index += 1
+        st.experimental_rerun()
+    else:
+        st.warning("Please select an option before continuing.")
+
 
         
