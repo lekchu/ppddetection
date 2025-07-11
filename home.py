@@ -64,18 +64,16 @@ pregnant = st.radio("Are you currently pregnant?", ["Yes", "No"])
 recent_birth = st.radio("Have you given birth recently?", ["Yes", "No"])
 family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
 
+name = st.text_input("Your Name")
+...
 if st.button("Start Questionnaire"):
-    if not name.strip():
+    if not name or not name.strip():
         st.warning("Please enter your name before proceeding.")
     else:
         st.session_state.user_data = {
             "Name": name,
-            "Age": age,
-            "Pregnant": pregnant,
-            "RecentBirth": recent_birth,
-            "FamilySupport": family_support
+            ...
         }
         st.session_state.page = "questionnaire"
         st.success("Starting questionnaire... please wait ⏳")
         st.stop()
-
