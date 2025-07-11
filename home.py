@@ -66,7 +66,7 @@ if st.session_state.page == "intro":
         submitted = st.form_submit_button("Start Questionnaire")
 
        
-            if st.button("Next"):
+    if st.button("Next"):
     if ans is not None:
         st.session_state.answers.append(score_map[options.index(ans)])
         st.session_state.q_index += 1
