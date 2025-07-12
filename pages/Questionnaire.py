@@ -13,6 +13,8 @@ elif st.session_state.page == "questionnaire":
     ]
     score_map = {0: 0, 1: 1, 2: 2, 3: 3}
 
+    st.progress((st.session_state.q_index + 1) / len(questions))
+
     if st.session_state.q_index < len(questions):
         q, options = questions[st.session_state.q_index]
         st.subheader(f"Q{st.session_state.q_index+1}: {q}")
