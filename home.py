@@ -71,7 +71,7 @@ if st.session_state.page == "home":
     family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
 
     if st.button("Start Questionnaire"):
-        if not name.strip():
+        if not name or not name.strip():
             st.warning("Please enter your name before continuing.")
         else:
             st.session_state.user_data = {
@@ -83,3 +83,70 @@ if st.session_state.page == "home":
             }
             st.session_state.page = "questionnaire"
             st.rerun()
+
+# =============================
+# SECTION 2: QUESTIONNAIRE
+# =============================
+elif st.session_state.page == "questionnaire":
+    st.title("📝 Questionnaire")
+    st.progress((st.session_state.q_index + 1) / len(questions))
+
+    if st.session_state.q_index < len(questions):
+        q, options = questions[st.session_state.q_index]
+        st.subheader(f"Q{st.session_state.q_index+1}: {q}")
+        ans = st.radio("Your Answer:", options, key=f"q{st.session_state.q_index}")
+
+        if st.button("Next"):
+            if ans:
+                st.session_state.answers.append(score_map[options.index(ans)])
+                st.session_state.q_index += 1
+                st.rerun()
+            else:
+                st.warning("Please select an answer before continuing.")
+    else:
+        st.session_state.page = "result"
+        st.rerun()
+
+# =============================
+# SECTION 3: RESULT
+# =============================
+elif st.session_state.page == "result":
+    st.title("🎯 Your Result")
+    score = sum(st.session_state.answers)
+    user = st.session_state.user_data
+
+    # Prepare input for prediction
+    input_df = pd.DataFrame([{
+        "Age": user["Age"],
+        "FamilySupport": user["FamilySupport"],
+        **{f"Q{i+1}": v for i, v in enumerate(st.session_state.answers)},
+        "EPDS_Score": score
+    }])
+
+    prediction = model.predict(input_df)[0]
+    label = le.inverse_transform([prediction])[0]
+
+    st.success(f"Hi {user['Name']}, your predicted risk level is: **{label}**")
+    st.progress(score / 30)
+
+    # Risk-based feedback
+    if label.lower() == "low":
+        st.balloons()
+        st.info("✅ You are likely in a good emotional state. Keep taking care of yourself! 💚")
+    elif label.lower() == "moderate":
+        st.warning("⚠️ You may be showing some signs of concern. Please talk to someone or consult a provider.")
+    else:
+        st.error("🚨 High risk detected. We strongly recommend speaking with a mental health professional.")
+
+    # CSV download (compatible with Python < 3.9)
+    merged_result = user.copy()
+    merged_result.update({"Score": score, "Risk": label})
+    result_csv = pd.DataFrame([merged_result])
+
+    st.download_button("📥 Download Result as CSV", data=result_csv.to_csv(index=False), file_name="ppd_result.csv")
+
+    if st.button("🔁 Start Over"):
+        for key in ["page", "user_data", "answers", "q_index"]:
+            st.session_state.pop(key, None)
+        st.rerun()
+
