@@ -1,23 +1,27 @@
-import streamlit as st
-import joblib
-import pandas as pd
-from utils import set_background
-
-st.set_page_config(page_title="Results - PPD Predictor", layout="wide")
-set_background("assets/background.png")
-
-if "answers" in st.session_state and len(st.session_state.answers) == 10:
+elif st.session_state.page == "result":
     score = sum(st.session_state.answers)
-    model = joblib.load("model/ppd_model_pipeline.pkl")
-    le = joblib.load("model/label_encoder.pkl")
+    user_info = st.session_state.user_data
+    input_data = pd.DataFrame([{
+        "Age": user_info["Age"],
+        "FamilySupport": user_info["FamilySupport"],
+        **{f"Q{i+1}": val for i, val in enumerate(st.session_state.answers)},
+        "EPDS_Score": score
+    }])
 
-    input_data = pd.DataFrame([{**{f"Q{i+1}": val for i, val in enumerate(st.session_state.answers)}, "Age": 28, "FamilySupport": "Medium", "EPDS_Score": score}])
+    pred = model.predict(input_data)[0]
+    label = le.inverse_transform([pred])[0]
 
-    prediction_encoded = model.predict(input_data)[0]
-    prediction_label = le.inverse_transform([prediction_encoded])[0]
+    st.header("🧾 Your Depression Risk Result")
+    st.markdown(f"### **{user_info['Name']}, your predicted risk level is:**")
+    st.success(f"💡 {label} (Score: {score}/30)")
 
-    st.subheader("🎯 Prediction Result")
-    st.markdown(f"### **Your Risk Level: {prediction_label}**")
+    # Advice based on label
+    if label.lower() == "low":
+        st.balloons()
+        st.info("You seem to be doing well. Keep nurturing your mental health and seek support when needed. 🌼")
+    elif label.lower() == "moderate":
+        st.warning("You might be experiencing moderate symptoms of postpartum depression. Consider speaking with a healthcare provider.")
+    else:
+        st.error("You are showing signs of high risk for postpartum depression. Please reach out to a mental health professional or support group immediately. 💬")
+
     st.progress(score / 30)
-else:
-    st.warning("Please complete the questionnaire first.")
