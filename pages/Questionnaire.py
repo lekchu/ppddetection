@@ -33,4 +33,4 @@ if st.session_state.q_index < len(questions):
         st.rerun()
 else:
     if st.button("Predict Risk"):
-        st.switch_page("pages/3_Result.py")
+        st.switch_page("pages/3_Result")
