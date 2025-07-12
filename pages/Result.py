@@ -1,36 +1,37 @@
 elif st.session_state.page == "result":
+    st.title("🎯 Your Result")
     score = sum(st.session_state.answers)
-    user_info = st.session_state.user_data
-    input_data = pd.DataFrame([{
-        "Age": user_info["Age"],
-        "FamilySupport": user_info["FamilySupport"],
-        **{f"Q{i+1}": val for i, val in enumerate(st.session_state.answers)},
+    user = st.session_state.user_data
+
+    # Prepare input for prediction
+    input_df = pd.DataFrame([{
+        "Age": user["Age"],
+        "FamilySupport": user["FamilySupport"],
+        **{f"Q{i+1}": v for i, v in enumerate(st.session_state.answers)},
         "EPDS_Score": score
     }])
 
-    pred = model.predict(input_data)[0]
-    label = le.inverse_transform([pred])[0]
+    prediction = model.predict(input_df)[0]
+    label = le.inverse_transform([prediction])[0]
 
-    st.header("🧾 Your Depression Risk Result")
-    st.markdown(f"### **{user_info['Name']}, your predicted risk level is:**")
-    st.success(f"💡 {label} (Score: {score}/30)")
+    st.success(f"Hi {user['Name']}, your predicted risk level is: **{label}**")
+    st.progress(score / 30)
 
-    # Advice based on label
+    # Risk-based feedback
     if label.lower() == "low":
         st.balloons()
-        st.info("You seem to be doing well. Keep nurturing your mental health and seek support when needed. 🌼")
+        st.info("✅ You are likely in a good emotional state. Keep taking care of yourself! 💚")
     elif label.lower() == "moderate":
-        st.warning("You might be experiencing moderate symptoms of postpartum depression. Consider speaking with a healthcare provider.")
+        st.warning("⚠️ You may be showing some signs of concern. Please talk to someone or consult a provider.")
     else:
-        st.error("You are showing signs of high risk for postpartum depression. Please reach out to a mental health professional or support group immediately. 💬")
+        st.error("🚨 High risk detected. We strongly recommend speaking with a mental health professional.")
 
-    st.progress(score / 30)
- # Download result as CSV
-    csv_data = pd.DataFrame.from_dict([user_info | {"Score": score, "Risk Level": label}])
-    st.download_button("📥 Download Result as CSV", data=csv_data.to_csv(index=False), file_name="ppd_result.csv", mime="text/csv")
+    # CSV download
+    result_csv = pd.DataFrame.from_dict([user | {"Score": score, "Risk": label}])
+    st.download_button("📥 Download Result as CSV", data=result_csv.to_csv(index=False), file_name="ppd_result.csv")
 
+    # Restart
     if st.button("🔁 Start Over"):
-        st.session_state.page = "intro"
-        st.session_state.answers = []
-        st.session_state.q_index = 0
-        st.experimental_rerun()
+        for key in ["page", "user_data", "answers", "q_index"]:
+            st.session_state.pop(key, None)
+        st.rerun()
