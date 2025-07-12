@@ -1,7 +1,7 @@
-# Place this in the root folder:
-# streamlit
-# pandas
-# joblib
-# scikit-learn
-# matplotlib
-# base64
+streamlit
+pandas
+scikit-learn
+joblib
+pandas
+matplotlib
+base64
