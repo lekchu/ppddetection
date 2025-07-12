@@ -46,6 +46,8 @@ if "q_index" not in st.session_state:
 def go_to(page):
     st.session_state.page = page
 
+# PAGES
+
 # INTRO PAGE
 if st.session_state.page == "intro":
     st.image("assets/mom_baby.png", width=200)
@@ -64,7 +66,8 @@ if st.session_state.page == "intro":
     recent_birth = st.radio("Have you given birth recently?", ["Yes", "No"])
     family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
 
-    if not name or not name.strip():
+    if st.button("Start Questionnaire"):
+        if not name or not name.strip():
             st.warning("Please enter your name before proceeding.")
         else:
             st.session_state.user_data = {
