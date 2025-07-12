@@ -64,7 +64,7 @@ if st.session_state.page == "intro":
     recent_birth = st.radio("Have you given birth recently?", ["Yes", "No"])
     family_support = st.selectbox("How would you rate your family support?", ["High", "Medium", "Low"])
 
-        if not name or not name.strip():
+    if not name or not name.strip():
             st.warning("Please enter your name before proceeding.")
         else:
             st.session_state.user_data = {
