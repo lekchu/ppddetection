@@ -26,8 +26,11 @@ elif st.session_state.page == "result":
     else:
         st.error("🚨 High risk detected. We strongly recommend speaking with a mental health professional.")
 
-    # CSV download
-    result_csv = pd.DataFrame.from_dict([user | {"Score": score, "Risk": label}])
+    # CSV download (without using dict | merge)
+    merged_result = user.copy()
+    merged_result.update({"Score": score, "Risk": label})
+    result_csv = pd.DataFrame([merged_result])
+
     st.download_button("📥 Download Result as CSV", data=result_csv.to_csv(index=False), file_name="ppd_result.csv")
 
     # Restart
