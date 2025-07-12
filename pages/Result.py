@@ -25,3 +25,12 @@ elif st.session_state.page == "result":
         st.error("You are showing signs of high risk for postpartum depression. Please reach out to a mental health professional or support group immediately. 💬")
 
     st.progress(score / 30)
+ # Download result as CSV
+    csv_data = pd.DataFrame.from_dict([user_info | {"Score": score, "Risk Level": label}])
+    st.download_button("📥 Download Result as CSV", data=csv_data.to_csv(index=False), file_name="ppd_result.csv", mime="text/csv")
+
+    if st.button("🔁 Start Over"):
+        st.session_state.page = "intro"
+        st.session_state.answers = []
+        st.session_state.q_index = 0
+        st.experimental_rerun()
